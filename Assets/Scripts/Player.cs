@@ -6,14 +6,65 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 7f;
-    [SerializeField] private GameInput gameInput;   
+    [SerializeField] private GameInput gameInput;
+    [SerializeField] private LayerMask counterLayerMask;
     private bool isWalking;
-    
+    private Vector3 lastInteractDir;
+
+
+    private void Start() {
+        gameInput.OnInteractAction += GameInput_OnInteractAction;
+    }
+
+    private void GameInput_OnInteractAction(object sender, System.EventArgs e) {
+        Vector2 inputVector = gameInput.GetMovementVectorNormalized();
+        Vector3 moveDir = new Vector3(inputVector.x, 0f, inputVector.y);
+
+        if (moveDir != Vector3.zero) {
+            lastInteractDir = moveDir;
+        }
+
+        float interactDistance = 2f;
+        if (Physics.Raycast(transform.position, lastInteractDir, out RaycastHit raycashit, interactDistance, counterLayerMask)) {
+            if (raycashit.transform.TryGetComponent(out ClearCounter clearcounter)) {
+                clearcounter.Interact();
+            }
+        }
+    }
+
     private void Update() {
+
+       HandleMovement();
+       HandleInteractions();
+
+    }
+
+    public bool IsWalking()
+    {
+        return isWalking;
+    }
+
+    private void HandleInteractions() {
+        Vector2 inputVector = gameInput.GetMovementVectorNormalized();
+        Vector3 moveDir = new Vector3(inputVector.x, 0f, inputVector.y);
+
+        if(moveDir != Vector3.zero) {
+            lastInteractDir = moveDir;
+        }
+
+        float interactDistance = 2f;
+       if (Physics.Raycast(transform.position, lastInteractDir, out RaycastHit raycashit, interactDistance, counterLayerMask)) {
+            if (raycashit.transform.TryGetComponent(out ClearCounter clearcounter)) {
+
+            }
+        } 
+    }
+
+    private void HandleMovement() {
 
         Vector2 inputVector = gameInput.GetMovementVectorNormalized();
 
-        Vector3 moveDir = new Vector3(inputVector.x, 0f,inputVector.y);
+        Vector3 moveDir = new Vector3(inputVector.x, 0f, inputVector.y);
 
 
         float moveDistance = moveSpeed * Time.deltaTime;
@@ -28,12 +79,12 @@ public class Player : MonoBehaviour
             // Attempt only x movement
             Vector3 moveDirX = new Vector3(moveDir.x, 0f, 0f).normalized;
             canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirX, moveDistance);
-            
+
             if (canMove) {
                 // can move only on the x
 
-            moveDir = moveDirX;
-            }else {
+                moveDir = moveDirX;
+            } else {
                 //cannot move only on the x
                 // Attempt only z movement
 
@@ -58,11 +109,6 @@ public class Player : MonoBehaviour
 
         float rotateSpeed = 10f;
         transform.forward = Vector3.Slerp(transform.forward, moveDir, Time.deltaTime * rotateSpeed);
-
     }
 
-    public bool IsWalking()
-    {
-        return isWalking;
-    }
 }
