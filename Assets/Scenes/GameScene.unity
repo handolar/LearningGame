@@ -1037,6 +1037,12 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 457209655476268867, guid: 8f8ddbe66acc5054db4810077e28134c,
+        type: 3}
+      propertyPath: kitchenObjectSO
+      value: 
+      objectReference: {fileID: 11400000, guid: 8a952eca31ec5fa43aead60dc86c49c5,
+        type: 2}
     - target: {fileID: 2028039328959646789, guid: 8f8ddbe66acc5054db4810077e28134c,
         type: 3}
       propertyPath: m_LocalPosition.x

@@ -6,19 +6,11 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    private static Player instance;
+    
 
-    public static Player Instance
-    {
-        get
-        {
-            return instance;
-        }
-        set
-        {
-            instance = value;
-        }
-    }
+    public static Player Instance { get; private set; }
+
+
 
     public event EventHandler<OnSelectedCounterChangedEventArgs> OnSelectedCounterChanged;
     public class OnSelectedCounterChangedEventArgs : EventArgs
@@ -33,6 +25,12 @@ public class Player : MonoBehaviour
     private Vector3 lastInteractDir;
     private ClearCounter selectedCounter;
 
+    private void Awake() {
+        if(Instance != null) {
+            Debug.Log("Mi rey no sabe contar");
+        }
+        Instance = this;
+    }
 
     private void Start() {
         gameInput.OnInteractAction += GameInput_OnInteractAction;
@@ -70,7 +68,7 @@ public class Player : MonoBehaviour
             if (raycashit.transform.TryGetComponent(out ClearCounter clearcounter)) {
                 if (clearcounter != selectedCounter)
                 {
-                    SetSelectedCounter(selectedCounter);
+                    SetSelectedCounter(clearcounter);                
                 }
             }
             else
@@ -78,7 +76,7 @@ public class Player : MonoBehaviour
                 SetSelectedCounter(null);
             }
         } else {
-                SetSelectedCounter(null);
+            SetSelectedCounter(null);
         }
     }
 
@@ -135,11 +133,11 @@ public class Player : MonoBehaviour
 
     private void SetSelectedCounter(ClearCounter selectedCounter)
     {
-                    this.selectedCounter = selectedCounter;
+          this.selectedCounter = selectedCounter;
 
-                    OnSelectedCounterChanged?.Invoke(this, new OnSelectedCounterChangedEventArgs
-                    {
-                        selectedCounter = selectedCounter
-                    });
+          OnSelectedCounterChanged?.Invoke(this, new OnSelectedCounterChangedEventArgs
+              {
+                   selectedCounter = selectedCounter
+              });
     }
 }
